@@ -1,10 +1,50 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
+import './Login.css'
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../Header/AuthProvider/AuthProvider';
 
 const Login = () => {
+    const [error, setError] = useState('')
+    const {loginUser} = useContext(AuthContext);
+    const navigate = useNavigate()
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
+    console.log(from)
+
+
+    const handleLogin = (event) =>{
+        event.preventDefault()
+        const form = event.target;
+        const email = form.email.value;
+        const password = form.password.value;
+        console.log(email, password)
+
+        loginUser(email, password)
+        .then(result=>{
+            const loggedUser = result.user;
+            console.log(loggedUser);
+            form.reset()
+            navigate(from, {replace:true})
+        })
+        .catch(error=>{
+            console.error(error);
+        })
+    }
     return (
-        <div>
-            <h2>Login coming sooon</h2>
-        </div>
+        <form onSubmit={handleLogin} className='form-container'>
+            <h2 className='form-title'>Login</h2>
+            <div className="form-control">
+                <label htmlFor="email">Email</label>
+                <input type="email" name="email" id="email" />
+            </div>
+            <div className="form-control">
+                <label htmlFor="password">Password</label>
+                <input type="password" name="password" id="password" />
+            </div>
+               <input className="input-btn" type="submit" value="Login" />
+               <p className='error-text'><small>{error}</small></p>
+               <p><small>New to ema John? <Link to='/signup'>Sign Up</Link></small></p>
+        </form>
     );
 };
 
